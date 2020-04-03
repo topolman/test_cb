@@ -6,7 +6,7 @@ const auth = require("../auth");
 
 router.post("/login", function(req, res, next) {
   const { username, password } = req.body;
-
+  console.log(username, password);
   const user = auth.users.find(u => {
     return u.username == username && u.password == password;
   });
@@ -14,21 +14,13 @@ router.post("/login", function(req, res, next) {
   if (user) {
     const accessToken = jwt.sign(
       { username: user.username, role: user.role },
-      auth.accessTokenSecret,
-      { expiresIn: "20m" }
+      auth.accessTokenSecret
     );
-    const refreshToken = jwt.sign(
-      { username: user.username, role: user.role },
-      auth.refreshTokenSecret
-    );
-
-    auth.refreshTokens.push(refreshToken);
 
     res.json({
       message: "success",
       data: {
-        accessToken,
-        refreshToken
+        accessToken
       }
     });
   } else {
