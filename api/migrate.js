@@ -11,6 +11,7 @@ function cnw8(buf) {
   return iconv.decode(Buffer.from(buf, "binary"), "cp1251").toString();
 }
 
+//Вспомогательная функция для преобразования XML в JSON
 function getValueByName(element, name) {
   const dataNode = get(element, "elements", []).find(
     item => name === item.name
@@ -18,12 +19,14 @@ function getValueByName(element, name) {
   return get(dataNode, "elements[0].text");
 }
 
+//Получить дату
 function getDate(date) {
   return moment(date, "DD/MM/YYYY", true).isValid()
     ? date
     : moment().format("DD/MM/YYYY");
 }
 
+//Получить дату месяц назад от date
 function getDateSubMonth(date) {
   return moment(date, "DD/MM/YYYY", true).isValid()
     ? moment(date, "DD/MM/YYYY")
@@ -34,6 +37,7 @@ function getDateSubMonth(date) {
         .format("DD/MM/YYYY");
 }
 
+//Обработать полученные данные и преобразовать их в JSON
 function dailyToJSON(obj) {
   const data = get(obj, "elements[0]", {});
   const pubDate = get(data, "attributes.Date");
@@ -55,6 +59,7 @@ function dailyToJSON(obj) {
   return json;
 }
 
+//Обработать полученные данные и преобразовать их в JSON
 function dynamicToJSON(obj, titleValute) {
   const data = get(obj, "elements[0]", {});
   const startDate = get(data, "attributes.DateRange1");
@@ -65,10 +70,7 @@ function dynamicToJSON(obj, titleValute) {
     data: get(data, "elements").map(element => {
       return {
         valuteID: get(element, "attributes.Id"),
-        date: moment(
-          get(element, "attributes.Date"),
-          "DD.MM.YYYY"
-        ).toISOString(),
+        date: moment(get(element, "attributes.Date"), "DD.MM.YYYY").unix(),
         numCode: get(titleValute, "numCode"),
         charCode: get(titleValute, "charCode"),
         nominal: getValueByName(element, "Nominal"),
@@ -80,6 +82,7 @@ function dynamicToJSON(obj, titleValute) {
   return json;
 }
 
+//Получить данные Daily
 function callDaily(date) {
   return fetch(
     `http://www.cbr.ru/scripts/XML_daily.asp?date_req=${getDate(date)}`
@@ -112,6 +115,7 @@ function callDaily(date) {
     );
 }
 
+//Получить данные Dynamic
 function callDynamic(startDate, endDate, valuteID, titleValute) {
   const params = [
     `date_req1=${getDate(startDate)}`,
@@ -131,11 +135,12 @@ function callDynamic(startDate, endDate, valuteID, titleValute) {
     );
 }
 
+//START
 callDaily().then(res => {
   const dropTableQuery = "DROP TABLE IF EXISTS currency";
   const createTableQuery = `CREATE TABLE IF NOT EXISTS currency (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      date text,
+      date INTEGER,
       valuteID text,
       numCode text,
       charCode text,

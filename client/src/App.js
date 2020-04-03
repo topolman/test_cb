@@ -6,7 +6,7 @@ function App() {
   const [state, setState] = React.useState({ apiResponse: "" });
 
   const callAPI = () => {
-    fetch("http://localhost:8080/test-api")
+    fetch("http://localhost:8080/api/valutes")
       .then(res => res.text())
       .then(res => setState({ apiResponse: res }));
   };
