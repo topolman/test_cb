@@ -20,7 +20,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
     "md5": "^2.2.1",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "morgan": "~1.9.1",
     "node-fetch": "^2.6.0",
     "sqlite": "^3.0.6",
